@@ -1,4 +1,4 @@
-package com.springjwt.entity;
+package com.springjwt.util;
 
 import org.springframework.stereotype.Service;
 import io.jsonwebtoken.Claims;

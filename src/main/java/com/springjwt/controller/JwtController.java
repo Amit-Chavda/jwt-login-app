@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.springjwt.entity.JwtRequest;
-import com.springjwt.entity.JwtUtil;
+import com.springjwt.util.JwtUtil;
 import com.springjwt.service.CustomUserDetailsService;
 
 @RestController

@@ -1,15 +1,8 @@
 package com.springjwt.filter;
 
-import java.io.IOException;
-import java.util.Arrays;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.springjwt.util.JwtUtil;
+import com.springjwt.service.CustomUserDetailsService;
+import com.springjwt.util.CookieUtil;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,63 +10,74 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.springjwt.entity.JwtUtil;
-import com.springjwt.service.CustomUserDetailsService;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-	@Autowired
-	private JwtUtil jwtUtil;
+    private JwtUtil jwtUtil;
+    private CustomUserDetailsService userDetailsService;
 
-	@Autowired
-	private CustomUserDetailsService userDetailsService;
+    public JwtAuthFilter(JwtUtil jwtUtil, CustomUserDetailsService userDetailsService) {
+        this.jwtUtil = jwtUtil;
+        this.userDetailsService = userDetailsService;
+    }
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
-		String header = request.getHeader("Authorization");
+        String cookieName = "token";
+        String username=null;
 
-		String username = null;
-		String token = null;
+        String header = request.getHeader("Authorization");
+        String token = CookieUtil.getCookieValueByName(request, cookieName);
 
-		if (request.getCookies() != null) {
-			Cookie tokenCookie = Arrays.stream(request.getCookies()).filter(c -> "token".equals(c.getName())).findAny()
-					.orElse(null);
-			token = tokenCookie.getValue();
+        if (token != null) {
+            username = jwtUtil.extractUsername(token);
 
-			username = jwtUtil.extractUsername(token);
-			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
 
-			if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-				UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-						userDetails, null, userDetails.getAuthorities());
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            } else {
+                throw new ServletException("Token Expired or Invalid token passed...");
+            }
 
-				authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-				SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-			} else {
-				throw new ServletException("Inavalid token");
-			}
+        } else if (header != null && header.startsWith("Bearer")) {
+            token = header.substring(7);
 
-		} else if (header != null && header.startsWith("Bearer")) {
-			token = header.substring(7);
-			username = jwtUtil.extractUsername(token);
+            try {
+                username = jwtUtil.extractUsername(token);
+            }catch (Exception exception){
+                //SignatureException when different secret key is used
+                //JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.
 
-			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                logger.error(exception.getMessage());
+            }
 
-			if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-				UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-						userDetails, null, userDetails.getAuthorities());
 
-				authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-				SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-			} else {
-				throw new ServletException("Inavalid token");
-			}
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-		}
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
 
-		filterChain.doFilter(request, response);
-	}
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            } else {
+                throw new ServletException("Token Expired or Invalid token passed...");
+            }
+
+        }
+
+        filterChain.doFilter(request, response);
+    }
 }

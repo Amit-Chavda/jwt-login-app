@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.springjwt.entity.JwtRequest;
 import com.springjwt.entity.JwtResponse;
-import com.springjwt.entity.JwtUtil;
+import com.springjwt.util.JwtUtil;
 import com.springjwt.service.CustomUserDetailsService;
 
 @org.springframework.stereotype.Controller
