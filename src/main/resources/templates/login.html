@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <head>
-    <title>Home</title>
+    <title>Login</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 </head>
 <!-- CSS only -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script>
+
+
     $(document).ready(function() {
+
+
+$('#loginBtn').on('click', function(){
+   // alert("Clicked")
+});
           const rmCheck = document.getElementById("rememberMe"),
     emailInput = document.getElementById("username");
 
@@ -93,8 +100,8 @@ label {
     <input type="text" id="username" name="username" required>
     <label for="pass">Password</label>
     <input type="password" id="pass" name="password" required>
-    <input type="checkbox" value="lsRememberMe" id="rememberMe"> <label for="rememberMe">Remember me</label>
-    <input type="submit" value="Login" onclick="lsRememberMe()"/>
+    <input type="checkbox" id="rememberMe" name="rememberMe"> <label for="rememberMe">Remember me</label>
+    <input type="submit" id="loginBtn" value="Login" onsubmit="lsRememberMe()" onclick="lsRememberMe()"/>
     <a href="http://localhost:8080/forgotPassword">Forgot Password?</a>
 </body>
 <script>

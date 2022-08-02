@@ -34,6 +34,7 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
 
         String username = request.getParameter("username");
         String password = request.getParameter("password");
+
         LOGGER.warn(username + " attempted to login!");
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,
                 password);
@@ -46,11 +47,20 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
 
 
         //1000 * 60 * 10 = 10 minutes
+        Date expiry = new Date(System.currentTimeMillis() + 1000 * 60 * 10); //10 minutes
+        int cookieExpiry = 60 * 10;
+
+        String rememberMe = request.getParameter("rememberMe");
+        if (rememberMe != null && rememberMe.equals("on")) {
+            expiry = new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 5);//5 days
+            cookieExpiry = 60 * 60 * 24 * 5;
+        }
+
         String token = new JwtUtil().generateToken(
                 (User) authResult.getPrincipal(),
-                new Date(System.currentTimeMillis() + 1000 * 60 * 10));
+                expiry);
         Cookie cookie = new Cookie("token", token);
-        cookie.setMaxAge(60 * 10); // expires in 10 mins
+        cookie.setMaxAge(cookieExpiry);
         cookie.setSecure(true);
         cookie.setHttpOnly(true);
         response.addCookie(cookie);

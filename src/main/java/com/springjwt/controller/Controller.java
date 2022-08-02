@@ -28,8 +28,8 @@ public class Controller {
 	@Autowired
 	private JwtUtil jwtUtil;
 
-	@RequestMapping("/token")
-	private ResponseEntity<JwtResponse> generateToken(@ModelAttribute JwtRequest jwtRequest) {
+	@GetMapping("/token")
+	public ResponseEntity<JwtResponse> generateToken(@ModelAttribute JwtRequest jwtRequest) {
 		JwtResponse response = new JwtResponse();
 
 		authenticationManager.authenticate(
@@ -66,7 +66,7 @@ public class Controller {
 		return "<h2>" + er + "</h2>";
 	}
 
-	@RequestMapping("/login")
+	@GetMapping("/login")
 	public String loginPage() {
 		return "login";
 	}
