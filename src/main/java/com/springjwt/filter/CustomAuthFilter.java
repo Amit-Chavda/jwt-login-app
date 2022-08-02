@@ -1,6 +1,7 @@
 package com.springjwt.filter;
 
 import java.io.IOException;
+import java.util.Date;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -20,37 +21,41 @@ import com.springjwt.util.JwtUtil;
 
 public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
 
-	private final Logger LOGGER = LoggerFactory.getLogger(CustomAuthFilter.class);
-	private final AuthenticationManager authenticationManager;
+    private final Logger LOGGER = LoggerFactory.getLogger(CustomAuthFilter.class);
+    private final AuthenticationManager authenticationManager;
 
-	public CustomAuthFilter(AuthenticationManager authenticationManager) {
-		this.authenticationManager = authenticationManager;
-	}
+    public CustomAuthFilter(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
+    }
 
-	@Override
-	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
-			throws AuthenticationException {
+    @Override
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
+            throws AuthenticationException {
 
-		String username = request.getParameter("username");
-		String password = request.getParameter("password");
-		LOGGER.warn(username + " attempted to login!");
-		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,
-				password);
-		return authenticationManager.authenticate(authenticationToken);
-	}
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        LOGGER.warn(username + " attempted to login!");
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,
+                password);
+        return authenticationManager.authenticate(authenticationToken);
+    }
 
-	@Override
-	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-			Authentication authResult) throws IOException, ServletException {
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+                                            Authentication authResult) throws IOException, ServletException {
 
-		String token = new JwtUtil().generateToken((User) authResult.getPrincipal());
-		Cookie cookie = new Cookie("token", token);
-		cookie.setMaxAge(5 * 60); // expires in 5 mins
-		cookie.setSecure(true);
-		cookie.setHttpOnly(true);
-		response.addCookie(cookie);
-		super.successfulAuthentication(request, response, chain, authResult);
-		LOGGER.info(authResult.getName() + " logged in successfully!");
-	}
+
+        //1000 * 60 * 10 = 10 minutes
+        String token = new JwtUtil().generateToken(
+                (User) authResult.getPrincipal(),
+                new Date(System.currentTimeMillis() + 1000 * 60 * 10));
+        Cookie cookie = new Cookie("token", token);
+        cookie.setMaxAge(60 * 10); // expires in 10 mins
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
+        super.successfulAuthentication(request, response, chain, authResult);
+        LOGGER.info(authResult.getName() + " logged in successfully!");
+    }
 
 }

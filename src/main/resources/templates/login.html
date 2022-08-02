@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <head>
     <title>Home</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -13,66 +12,6 @@
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
 <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
-
-
-<script>
-
-	$(document).ready(function () {
-
-		$("#").on('submit', function () {
-			$.ajax({
-				type: "GET",
-				url: "http://localhost:8080/token",
-				dataType: 'json',
-				cache: false,
-				data:
-				{
-					username: $('input[name = "username"]').val(),
-					password: $('input[name = "password"]').val()
-				},
-				complete: function (er) {
-					window.location.href = "http://localhost:8080/";
-				},
-
-				success: function (result) {
-					//localStorage.setItem("token", result.token);
-				},
-				error: function (er) {
-					alert(er);
-				}
-
-			});
-		});
-
-
-
-		function redirectHome() {
-			alert("submitted")
-			alert(localStorage.getItem('token'))
-			$.ajax({
-				type: "GET",
-				url: "http://localhost:8080/text",
-				dataType: 'json',
-				cache: false,
-				beforeSend: function (xhr) {
-					xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
-				},
-				complete: function (er) {
-					alert(er)
-				},
-				error: function (er) {
-					alert(er);
-				},
-				fail: function (er) {
-					alert(er);
-				}
-			});
-		}
-
-
-	});
-
-</script>
 <style type="text/css">
 body {
   font-family: "Open Sans", sans-serif;
@@ -131,6 +70,29 @@ label {
     <label for="pass">Password</label>
     <input type="password" id="pass" name="password" required>
     <input type="checkbox" value="lsRememberMe" id="rememberMe"> <label for="rememberMe">Remember me</label>
-    <input type="submit" value="Login" onclick="lsRememberMe()">
+    <input type="submit" value="Login" onclick="lsRememberMe()"/>
 </body>
+<script type="javascript">
+    const rmCheck = document.getElementById("rememberMe"),
+    emailInput = document.getElementById("email");
+
+if (localStorage.checkbox && localStorage.checkbox !== "") {
+  rmCheck.setAttribute("checked", "checked");
+  emailInput.value = localStorage.username;
+} else {
+  rmCheck.removeAttribute("checked");
+  emailInput.value = "";
+}
+
+function lsRememberMe() {
+  if (rmCheck.checked && emailInput.value !== "") {
+    localStorage.username = emailInput.value;
+    localStorage.checkbox = rmCheck.value;
+  } else {
+    localStorage.username = "";
+    localStorage.checkbox = "";
+  }
+}
+
+</script>
 </html>

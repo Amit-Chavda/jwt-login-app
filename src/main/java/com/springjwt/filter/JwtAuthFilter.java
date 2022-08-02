@@ -31,13 +31,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        JwtUtil jwtUtil=new JwtUtil();
         String cookieName = "token";
         String username=null;
 
         String header = request.getHeader("Authorization");
         String token = CookieUtil.getCookieValueByName(request, cookieName);
 
-        if (token != null) {
+        if (token != null && !jwtUtil.isTokenExpired(token)) {
             username = jwtUtil.extractUsername(token);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -59,10 +60,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }catch (Exception exception){
                 //SignatureException when different secret key is used
                 //JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.
-
                 logger.error(exception.getMessage());
             }
-
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 

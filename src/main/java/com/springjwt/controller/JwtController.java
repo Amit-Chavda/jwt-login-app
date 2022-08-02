@@ -27,8 +27,6 @@ public class JwtController {
 
 	@RequestMapping("/token2")
 	private ResponseEntity<String> generateToken(@RequestBody JwtRequest jwtRequest) {
-
-		System.out.println("hello world");
 		try {
 
 			System.out.println(jwtRequest.getUsername() + " : " + jwtRequest.getPassword());

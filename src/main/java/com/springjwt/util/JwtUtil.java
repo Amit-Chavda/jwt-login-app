@@ -14,6 +14,8 @@ import java.util.function.Function;
 
 import io.jsonwebtoken.Claims;
 
+import javax.xml.crypto.Data;
+
 @Service
 public class JwtUtil {
 	private static final String SECRET_KEY = "secret";
@@ -39,15 +41,25 @@ public class JwtUtil {
 		return extractExpiration(token).before(new Date());
 	}
 
+	public String generateToken(UserDetails userDetails, Date expiry) {
+		Map<String, Object> claims = new HashMap<>();
+		return createToken(claims, userDetails.getUsername(),expiry);
+	}
 	public String generateToken(UserDetails userDetails) {
 		Map<String, Object> claims = new HashMap<>();
 		return createToken(claims, userDetails.getUsername());
 	}
-
 	private String createToken(Map<String, Object> claims, String subject) {
 
 		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+				.signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
+	}
+	private String createToken(Map<String, Object> claims, String subject,Date expiry) {
+
+		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+				//.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+				.setExpiration(expiry)
 				.signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
 	}
 
