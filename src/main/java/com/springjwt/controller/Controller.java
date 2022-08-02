@@ -4,15 +4,13 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.springjwt.util.CookieUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import com.springjwt.entity.JwtRequest;
 import com.springjwt.entity.JwtResponse;
@@ -47,16 +45,13 @@ public class Controller {
 		return ResponseEntity.ok(response);
 	}
 
-	@RequestMapping("/getToken")
-	private ResponseEntity<JwtResponse> getToken(@RequestParam String username, HttpServletRequest req) {
-
-		String token = jwtUtil.generateToken(userDetailsService.loadUserByUsername(username));
-
+	@GetMapping("/getToken")
+	public ResponseEntity<JwtResponse> getToken(HttpServletRequest request) {
+		String token = CookieUtil.getCookieValueByName(request,"token");
 		JwtResponse response = new JwtResponse();
 		response.setToken(token);
 		response.setExpiryTime(jwtUtil.extractExpiration(token).toString());
 		response.setTokenExpired(jwtUtil.isTokenExpired(token));
-
 		return ResponseEntity.ok(response);
 	}
 
@@ -81,7 +76,6 @@ public class Controller {
 		Cookie c = new Cookie("token", "");
 		c.setMaxAge(0);
 		response.addCookie(c);
-
 		return "login";
 	}
 }
