@@ -1,11 +1,12 @@
 package com.springjwt.filter;
 
+import com.springjwt.service.UserService;
 import com.springjwt.util.JwtUtil;
-import com.springjwt.service.CustomUserDetailsService;
 import com.springjwt.util.CookieUtil;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -19,21 +20,20 @@ import java.io.IOException;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private JwtUtil jwtUtil;
-    private CustomUserDetailsService userDetailsService;
 
-    public JwtAuthFilter(JwtUtil jwtUtil, CustomUserDetailsService userDetailsService) {
-        this.jwtUtil = jwtUtil;
+    private UserService userDetailsService;
+
+    public JwtAuthFilter(UserService userDetailsService) {
+
         this.userDetailsService = userDetailsService;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-
-        JwtUtil jwtUtil=new JwtUtil();
+        JwtUtil jwtUtil = new JwtUtil();
         String cookieName = "token";
-        String username=null;
+        String username = null;
 
         String header = request.getHeader("Authorization");
         String token = CookieUtil.getCookieValueByName(request, cookieName);
@@ -57,7 +57,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             try {
                 username = jwtUtil.extractUsername(token);
-            }catch (Exception exception){
+            } catch (Exception exception) {
                 //SignatureException when different secret key is used
                 //JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.
                 logger.error(exception.getMessage());

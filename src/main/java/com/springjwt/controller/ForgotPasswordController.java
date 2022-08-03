@@ -1,17 +1,26 @@
 package com.springjwt.controller;
 
 import com.springjwt.entity.ResetPasswordToken;
+import com.springjwt.entity.User;
+import com.springjwt.service.ResetPasswordTokenService;
+import com.springjwt.service.UserService;
+import com.springjwt.util.TokenUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 @Controller
 public class ForgotPasswordController {
-    private List<ResetPasswordToken> tokenList = new ArrayList<>();
+
+    private final Logger logger = LoggerFactory.getLogger(ForgotPasswordController.class);
+    private UserService userService;
+    private ResetPasswordTokenService resetPasswordTokenService;
+
+    public ForgotPasswordController(UserService userService, ResetPasswordTokenService resetPasswordTokenService) {
+        this.userService = userService;
+        this.resetPasswordTokenService = resetPasswordTokenService;
+    }
 
     @GetMapping("/forgotPassword")
     public String forgotPassword() {
@@ -20,33 +29,20 @@ public class ForgotPasswordController {
 
     @PostMapping("/forgotPassword")
     @ResponseBody
-    public String forgotPassword(@RequestBody String email) {
-        String token = (new Random().nextInt(500000) * 1000) + "";
-        ResetPasswordToken resetPasswordToken = new ResetPasswordToken();
-        resetPasswordToken.setToken(token);
-        resetPasswordToken.setEmail(email);
-        resetPasswordToken.setExpiry(LocalDateTime.now().plusHours(2));
-        tokenList.add(resetPasswordToken);
-        String url = "http://localhost:8080/resetPassword?token=" + token;
-        return url;
-    }
-
-    @GetMapping("/resetPassword")
-    public String resetPassword() {
-        return "resetPassword";
-    }
-
-    @PostMapping(path = "/resetPassword")
-    public String resetPassword(@RequestParam String token) {
-        //validate token
-        ResetPasswordToken passwordToken = tokenList.stream().filter((t1) -> {
-            return t1.getToken().equals(token);
-        }).findFirst().orElse(null);
-
-        if (!passwordToken.getExpiry().isBefore(LocalDateTime.now())) {
-            System.out.println("Password Reset successfully!");
-            return "resetPassword";
+    public String forgotPassword(@ModelAttribute(name = "username") String username) {
+        User user;
+        ResetPasswordToken resetPasswordToken = null;
+        try {
+            user = userService.findByUsername(username);
+            resetPasswordToken = TokenUtil.generateResetPasswordTokenForUser(user);
+            resetPasswordTokenService.save(resetPasswordToken);
+            return "<h2>" +
+                    "Click the <a href='http://localhost:9091/resetPassword?token=" + resetPasswordToken.getToken() + "'>link </a>to reset your password!" +
+                    "</h2>";
+        } catch (Exception e) {
+            logger.error(e.getMessage());
         }
-        return "login";
+
+        return "<h2>Something went wrong!</h2>";
     }
 }

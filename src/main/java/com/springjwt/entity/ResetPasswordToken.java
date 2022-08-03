@@ -1,42 +1,26 @@
 package com.springjwt.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@Data
+@AllArgsConstructor
+@RequiredArgsConstructor
+@ToString
+@Entity
 public class ResetPasswordToken {
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int _id;
     private String token;
     private LocalDateTime expiry;
-    private String email;
+    private LocalDateTime _createdAt;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public LocalDateTime getExpiry() {
-        return expiry;
-    }
-
-    public void setExpiry(LocalDateTime expiry) {
-        this.expiry = expiry;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    @OneToOne(cascade = CascadeType.ALL, targetEntity = User.class)
+    private User user;
 }

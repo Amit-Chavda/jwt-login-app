@@ -1,44 +1,47 @@
 package com.springjwt.controller;
 
+import com.springjwt.entity.JwtResponse;
+import com.springjwt.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.springjwt.entity.JwtRequest;
 import com.springjwt.util.JwtUtil;
-import com.springjwt.service.CustomUserDetailsService;
 
 @RestController
 public class JwtController {
 
-	@Autowired
-	CustomUserDetailsService userDetailsService;
+    @Autowired
+    UserService userDetailsService;
 
-	@Autowired
-	AuthenticationManager authenticationManager;
+    @Autowired
+    AuthenticationManager authenticationManager;
 
-	@Autowired
-	JwtUtil jwtUtil;
+    @Autowired
+    JwtUtil jwtUtil;
 
-	@RequestMapping("/token2")
-	private ResponseEntity<String> generateToken(@RequestBody JwtRequest jwtRequest) {
-		try {
+    @GetMapping("/token")
+    public ResponseEntity<JwtResponse> generateToken(@ModelAttribute JwtRequest jwtRequest) {
+        JwtResponse response = new JwtResponse();
 
-			System.out.println(jwtRequest.getUsername() + " : " + jwtRequest.getPassword());
-			authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(jwtRequest.getUsername(), jwtRequest.getPassword()));
-		} catch (Exception e) {
-			throw e;
-		}
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        jwtRequest.getUsername(),
+                        jwtRequest.getPassword())
+        );
 
-		UserDetails user = userDetailsService.loadUserByUsername(jwtRequest.getUsername());
+        UserDetails user = userDetailsService.loadUserByUsername(jwtRequest.getUsername());
 
-		return ResponseEntity.ok(jwtUtil.generateToken(user));
+        String token = jwtUtil.generateToken(user);
+        response.setToken(token);
+        response.setExpiryTime(jwtUtil.extractExpiration(token).toString());
+        response.setTokenExpired(jwtUtil.isTokenExpired(token));
 
-	}
+        return ResponseEntity.ok(response);
+    }
+
 }

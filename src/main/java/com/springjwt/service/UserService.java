@@ -23,20 +23,24 @@ public class UserService implements UserDetailsService {
 
         Optional<User> userOptional = userRepository.findByUsername(username);
 
+
         if (userOptional.isEmpty()) {
             throw new UsernameNotFoundException("User with username " + username + " not found");
         }
-        User user = userOptional.get();
-
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .build();
+        return userOptional.get();
     }
 
 
-    private User save(User user) {
+    public User save(User user) {
         return userRepository.save(user);
     }
 
+    public User findByUsername(String username) throws Exception {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+
+        if (userOptional.isEmpty()) {
+            throw new UsernameNotFoundException("User with username " + username + " not found!");
+        }
+        return userOptional.get();
+    }
 }

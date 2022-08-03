@@ -1,5 +1,6 @@
 package com.springjwt.config;
 
+import com.springjwt.service.UserService;
 import org.springframework.context.annotation.Bean;
 
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,17 +19,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.springjwt.filter.CustomAuthFailure;
 import com.springjwt.filter.CustomAuthFilter;
 import com.springjwt.filter.JwtAuthFilter;
-import com.springjwt.service.CustomUserDetailsService;
 
 @EnableWebSecurity
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
 
-    private CustomUserDetailsService customUserDetailsService;
+    private UserService customUserDetailsService;
     private JwtAuthFilter authFilter;
     private CustomAuthFailure authFailure;
 
-    public SecurityConfigurer(CustomUserDetailsService customUserDetailsService, JwtAuthFilter authFilter, CustomAuthFailure authFailure) {
+    public SecurityConfigurer(UserService customUserDetailsService, JwtAuthFilter authFilter, CustomAuthFailure authFailure) {
         this.customUserDetailsService = customUserDetailsService;
         this.authFilter = authFilter;
         this.authFailure = authFailure;
@@ -44,7 +44,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
         http.csrf().disable().cors().disable();
 
         http.authorizeRequests()
-                .antMatchers("/login","/forgotPassword","/resetPassword").permitAll()
+                .antMatchers("/login", "/forgotPassword", "/resetPassword", "/register", "/loginError").permitAll()
                 .antMatchers("/loginError").permitAll()
                 .anyRequest().authenticated();
 
@@ -52,6 +52,8 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.formLogin()
+                .usernameParameter("username")
+                .passwordParameter("password")
                 .loginPage("/login")
                 .failureHandler(authFailure);
 

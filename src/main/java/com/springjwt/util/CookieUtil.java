@@ -5,6 +5,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 
 public class CookieUtil {
+    private CookieUtil() {
+        throw new IllegalStateException("Cookie Utility class");
+    }
+
     public static String getCookieValueByName(HttpServletRequest request, String cookieName) {
 
         if (request.getCookies() != null) {

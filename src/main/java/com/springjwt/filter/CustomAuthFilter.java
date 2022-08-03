@@ -8,20 +8,21 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.springjwt.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.springjwt.util.JwtUtil;
 
 public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(CustomAuthFilter.class);
+    private final Logger logger = LoggerFactory.getLogger(CustomAuthFilter.class);
     private final AuthenticationManager authenticationManager;
 
     public CustomAuthFilter(AuthenticationManager authenticationManager) {
@@ -35,9 +36,11 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
-        LOGGER.warn(username + " attempted to login!");
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,
-                password);
+
+        logger.warn("{} attempted to login!",username);
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(username,password);
+
         return authenticationManager.authenticate(authenticationToken);
     }
 
@@ -65,7 +68,7 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
         cookie.setHttpOnly(true);
         response.addCookie(cookie);
         super.successfulAuthentication(request, response, chain, authResult);
-        LOGGER.info(authResult.getName() + " logged in successfully!");
+        logger.info("{} logged in successfully!",authResult.getName());
     }
 
 }
