@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <head>
-    <title>Forgot Password</title>
+    <title>Register</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 </head>
 <!-- CSS only -->
@@ -55,13 +55,14 @@ label {
   font-size: .875rem;
 }
 
-
-
 </style>
 <body>
-<form action="/forgotPassword" method="post">
-    <label for="username">Username</label>
+<form id="loginForm" method="post">
+    <label for="username">Username/Email</label>
     <input type="text" id="username" name="username" required>
-    <input type="submit" value="Send email" />
+    <label for="pass">Password</label>
+    <input type="password" id="pass" name="password" required>
+    <input type="submit" id="loginBtn" value="Register"/>
+    Already registered? <a href="http://localhost:9091/login">Login</a>
 </body>
 </html>

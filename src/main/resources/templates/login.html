@@ -5,42 +5,6 @@
 </head>
 <!-- CSS only -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-<script>
-
-
-    $(document).ready(function() {
-
-
-$('#loginBtn').on('click', function(){
-   // alert("Clicked")
-});
-          const rmCheck = document.getElementById("rememberMe"),
-    emailInput = document.getElementById("username");
-
-if (localStorage.checkbox && localStorage.checkbox !== "") {
-  rmCheck.setAttribute("checked", "checked");
-  emailInput.value = localStorage.username;
-} else {
-  rmCheck.removeAttribute("checked");
-  emailInput.value = "";
-}
-
-function lsRememberMe() {
-alert("submitted")
-
-  if (rmCheck.checked && emailInput.value !== "") {
-    localStorage.username = emailInput.value;
-    localStorage.checkbox = rmCheck.value;
-  } else {
-    localStorage.username = "";
-    localStorage.checkbox = "";
-  }
-}
-
-
-    });
-
-</script>
 <style type="text/css">
 body {
   font-family: "Open Sans", sans-serif;
@@ -90,9 +54,6 @@ label {
   color: #666;
   font-size: .875rem;
 }
-
-
-
 </style>
 <body>
 <form id="loginForm" method="post">
@@ -102,9 +63,6 @@ label {
     <input type="password" id="pass" name="password" required>
     <input type="checkbox" id="rememberMe" name="rememberMe"> <label for="rememberMe">Remember me</label>
     <input type="submit" id="loginBtn" value="Login" onsubmit="lsRememberMe()" onclick="lsRememberMe()"/>
-    <a href="http://localhost:8080/forgotPassword">Forgot Password?</a>
+    <a href="http://localhost:9091/forgotPassword">Forgot Password?</a>
 </body>
-<script>
-
-</script>
 </html>
