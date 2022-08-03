@@ -28,32 +28,6 @@ public class Controller {
 	@Autowired
 	private JwtUtil jwtUtil;
 
-	@GetMapping("/token")
-	public ResponseEntity<JwtResponse> generateToken(@ModelAttribute JwtRequest jwtRequest) {
-		JwtResponse response = new JwtResponse();
-
-		authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(jwtRequest.getUsername(), jwtRequest.getPassword()));
-
-		UserDetails user = userDetailsService.loadUserByUsername(jwtRequest.getUsername());
-
-		String token = jwtUtil.generateToken(user);
-		response.setToken(token);
-		response.setExpiryTime(jwtUtil.extractExpiration(token).toString());
-		response.setTokenExpired(jwtUtil.isTokenExpired(token));
-
-		return ResponseEntity.ok(response);
-	}
-
-	@GetMapping("/getToken")
-	public ResponseEntity<JwtResponse> getToken(HttpServletRequest request) {
-		String token = CookieUtil.getCookieValueByName(request,"token");
-		JwtResponse response = new JwtResponse();
-		response.setToken(token);
-		response.setExpiryTime(jwtUtil.extractExpiration(token).toString());
-		response.setTokenExpired(jwtUtil.isTokenExpired(token));
-		return ResponseEntity.ok(response);
-	}
 
 	@RequestMapping("/")
 	public String hello() {
