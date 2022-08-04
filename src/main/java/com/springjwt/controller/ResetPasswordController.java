@@ -36,7 +36,7 @@ public class ResetPasswordController {
             ResetPasswordToken resetPasswordToken = resetPasswordTokenService.findByToken(token);
 
             //expired token
-            if (TokenUtil.isExpired(resetPasswordToken)) {
+            if (TokenUtil.isExpired(resetPasswordToken) || !resetPasswordToken.isEnabled()) {
                 return "<h3>" +
                         "<p style=\"text-align:center;color:red;\">Link has expired!" +
                         "</h3><br>" +
@@ -48,6 +48,8 @@ public class ResetPasswordController {
             User user = resetPasswordToken.getUser();
             user.setPassword(new BCryptPasswordEncoder().encode(password));
             userService.save(user);
+            resetPasswordToken.setEnabled(false);
+            resetPasswordTokenService.save(resetPasswordToken);
             return "<h2>" +
                     "<p style=\"text-align:center;color:green;\">Password reset successfully!</p><br> " +
                     "<p style=\"text-align:center;\">Click <a href='http://localhost:9091/login'>here</a> to login!</p>" +

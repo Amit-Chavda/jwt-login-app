@@ -17,6 +17,7 @@ public class TokenUtil {
         resetPasswordToken.setToken(UUID.randomUUID().toString());
         resetPasswordToken.setExpiry(LocalDateTime.now().plusHours(1));
         resetPasswordToken.set_createdAt(LocalDateTime.now());
+        resetPasswordToken.setEnabled(true);
         resetPasswordToken.setUser(user);
         return resetPasswordToken;
     }

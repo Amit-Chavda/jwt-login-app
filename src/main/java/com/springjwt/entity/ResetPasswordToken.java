@@ -20,6 +20,7 @@ public class ResetPasswordToken {
     private String token;
     private LocalDateTime expiry;
     private LocalDateTime _createdAt;
+    private boolean isEnabled;
 
     @OneToOne(cascade = CascadeType.ALL, targetEntity = User.class)
     private User user;
