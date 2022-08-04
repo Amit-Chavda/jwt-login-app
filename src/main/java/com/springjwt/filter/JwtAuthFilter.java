@@ -1,12 +1,11 @@
 package com.springjwt.filter;
 
 import com.springjwt.service.UserService;
-import com.springjwt.util.JwtUtil;
 import com.springjwt.util.CookieUtil;
+import com.springjwt.util.JwtUtil;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;

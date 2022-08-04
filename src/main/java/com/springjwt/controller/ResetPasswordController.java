@@ -37,23 +37,30 @@ public class ResetPasswordController {
 
             //expired token
             if (TokenUtil.isExpired(resetPasswordToken)) {
-                return "<h3>Session has expired!</h3><br>" +
-                        "<a href='http://localhost:9091/forgotPassword'>Try Again</a>";
+                return "<h3>" +
+                        "<p style=\"text-align:center;color:red;\">Link has expired!" +
+                        "</h3><br>" +
+                        "<p style=\"text-align:center;\">" +
+                        "<a href='http://localhost:9091/forgotPassword'>Try Again</a>" +
+                        "</p>";
             }
 
             User user = resetPasswordToken.getUser();
-            logger.info(password);
-            logger.info(user.toString());
-            logger.info(resetPasswordToken.toString());
             user.setPassword(new BCryptPasswordEncoder().encode(password));
             userService.save(user);
             return "<h2>" +
-                    "Password reset successfully!<br> " +
-                    "Click <a href='http://localhost:9091/login'>here</a> to login!" +
+                    "<p style=\"text-align:center;color:green;\">Password reset successfully!</p><br> " +
+                    "<p style=\"text-align:center;\">Click <a href='http://localhost:9091/login'>here</a> to login!</p>" +
                     "</h2>";
-        } catch (Exception e) {
-            logger.error(e.getMessage());
+        } catch (IllegalStateException illegalStateException) {
+            logger.error(illegalStateException.getMessage());
+            return "<h3>" +
+                    "<p style=\"text-align:center;color:red;\">Link has expired or invalid link accessed!" +
+                    "</h3>";
+        } catch (Exception exception) {
+            return "<h2>" +
+                    "<p style=\"text-align:center;color:red;\">Something wen wrong!" +
+                    "</h2>";
         }
-        return "<h3>Something went wrong!</h3>";
     }
 }

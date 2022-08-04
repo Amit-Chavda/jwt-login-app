@@ -2,7 +2,6 @@ package com.springjwt.service;
 
 import com.springjwt.entity.ResetPasswordToken;
 import com.springjwt.repo.ResetPasswordTokenRepository;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -16,23 +15,15 @@ public class ResetPasswordTokenService {
         this.passwordTokenRepository = passwordTokenRepository;
     }
 
-    public ResetPasswordToken findByUsername(String username) throws Exception {
-        Optional<ResetPasswordToken> userOptional = passwordTokenRepository.findByUser(username);
-        if (userOptional.isEmpty()) {
-            throw new Exception("Reset Token for user " + username + " not found!");
-        }
-        return userOptional.get();
-    }
-
     public ResetPasswordToken save(ResetPasswordToken resetPasswordToken) {
         return passwordTokenRepository.save(resetPasswordToken);
     }
 
-    public ResetPasswordToken findByToken(String token) throws Exception {
+    public ResetPasswordToken findByToken(String token) throws IllegalStateException {
         Optional<ResetPasswordToken> resetPasswordToken = passwordTokenRepository.findByToken(token);
 
         if (resetPasswordToken.isEmpty()) {
-            throw new UsernameNotFoundException("Token not found");
+            throw new IllegalStateException("Invalid token!");
         }
         return resetPasswordToken.get();
     }
