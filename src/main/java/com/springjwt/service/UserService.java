@@ -35,7 +35,7 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
-    public User findByUsername(String username) throws Exception {
+    public User findByUsername(String username) throws UsernameNotFoundException {
         Optional<User> userOptional = userRepository.findByUsername(username);
 
         if (userOptional.isEmpty()) {
